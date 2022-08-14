@@ -1,7 +1,7 @@
 const { build } = require("esbuild");
 const { dependencies } = require("./package.json");
 
-const entryFile = "src/components/Map.tsx";
+const entryFile = "src/index.ts";
 const shared = {
   bundle: true,
   entryPoints: [entryFile],
