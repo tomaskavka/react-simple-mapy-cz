@@ -11,9 +11,9 @@
 			"esModuleInterop": true,
 			"skipLibCheck": true,
 			"forceConsistentCasingInFileNames": true,
-			"rootDir": "./src",
+			"rootDir": "./",
 			"baseUrl": ".",
 	},
-	"include": ["src"],
+	"include": ["src", "types", "examples"],
 	"exclude": ["node_modules"]
 }

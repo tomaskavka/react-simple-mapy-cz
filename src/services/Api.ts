@@ -1,200 +1,99 @@
-import ApiLoader, { ApiConfig, ApiVariantType } from './ApiLoader';
+import ApiLoader, { ApiConfigType } from './ApiLoader';
+import createCoords from '../utils/createCoords';
+
+const FullAPI = import('./FullAPI');
+const SimpleAPI = import('./SimpleAPI');
 
 type CoordsType = {
-	lat: number;
-	lon: number;
+  lat: number;
+  lon: number;
 };
 
-type LayerType =
-	| 'BASE'
-	| 'TURIST'
-	| 'OPHOTO'
-	| 'HYBRID'
-	| 'HISTORIC'
-	| 'OPHOTO0203'
-	| 'OPHOTO0406'
-	| 'OBLIQUE'
-	| 'SMART_BASE'
-	| 'SMART_OPHOTO'
-	| 'SMART_TURIST'
-	| 'RELIEF'
-	| 'PANO'
-	| 'TURIST_WINTER'
-	| 'SMART_WINTER'
-	| 'SMART_SUMMER'
-	| 'GEOGRAPHY'
-	| 'OPHOTO1012'
-	| 'HYBRID_SPARSE'
-	| 'OPHOTO1415'
-	| 'OPHOTO1618';
-
-type ControlsType = {
-	hasDefault?: boolean;
-	compass?: {
-		title?: string;
-		style?: Record<string, string | number>;
-	};
-	mouse?: ('pan' | 'wheel' | 'zoom' | 'zoom-in' | 'zoom-out')[];
-	keyboard?: ('pan' | 'zoom')[];
+export type ControlsType = {
+  hasDefault?: boolean;
+  compass?: SMapCompassOptionsType;
+  mouse?: ('pan' | 'wheel' | 'zoom' | 'zoom-in' | 'zoom-out')[];
+  keyboard?: ('pan' | 'zoom')[];
 };
 
-type MarkerType = {
+export type MarkerType = {
   center: CoordsType;
   name: string;
-  options?: {
-    prefetch?: number;
-    supportsAnimation?: boolean;
-    poiTooltip?: boolean;
-  };
+  options?: SMapMarkerOptionsType;
 };
 
 export type MapConfig = {
-	center?: CoordsType;
-	zoom?: number;
-	defaultLayer?: LayerType;
-	sync?: {
-		isEnabled?: boolean;
-		bottom?: number;
-	};
-	controls?: ControlsType;
+  center?: CoordsType;
+  zoom?: number;
+  defaultLayer?: SMapLayerTypeType;
+  sync?: {
+    isEnabled?: boolean;
+    bottom?: number;
+  };
+  controls?: ControlsType;
   markers?: MarkerType[];
-	apiConfig?: ApiConfig;
+  apiConfig?: ApiConfigType;
 };
 
 class Api {
-  private static markersLayers: Record<string, any> = {};
+  private static processSimpleAPI = async (map: SMapMapType, config: Pick<MapConfig, 'markers'>) => {
+    if (ApiLoader.loadedApiVariant === 'full') {
+      console.info(
+        'Map should be loaded with Simple API but Full API is already loaded so map now uses Full API.'
+      );
 
-	public static async loadMapIntoContainer(
-		container: HTMLDivElement,
-		{ apiConfig, ...config }: MapConfig = {}
-	) {
-		await ApiLoader.init(apiConfig);
+      return null;
+    }
 
-		const {
-			center = {
-				lat: 50.0674706,
-				lon: 14.4715394,
-			},
-			defaultLayer = 'BASE',
-			zoom = 14,
-			sync = { isEnabled: false },
-			controls,
+    const { default: SimpleAPIInstance } = await SimpleAPI;
+
+    return new SimpleAPIInstance(map, config);
+  };
+
+  private static processFullAPI = async (
+    map: SMapMapType,
+    config: Pick<MapConfig, 'defaultLayer' | 'sync' | 'controls' | 'markers'>
+  ) => {
+    const { default: FullAPIInstance } = await FullAPI;
+
+    return new FullAPIInstance(map, config);
+  };
+
+  public static async loadMapIntoContainer(
+    container: HTMLDivElement,
+    { apiConfig, ...config }: MapConfig = {}
+  ) {
+    await ApiLoader.init({ api: 'full', ...apiConfig });
+
+    const {
+      center = {
+        lat: 50.0674706,
+        lon: 14.4715394,
+      },
+      defaultLayer = 'BASE',
+      zoom = 14,
+      sync = { isEnabled: false },
+      controls,
       markers = [],
-		} = config;
+    } = config;
 
-		const map = Api.createMap(container, Api.createCoords(center), zoom);
+    const map = Api.createMap(container, createCoords(center), zoom);
+    const result = { map, Smap: window.SMap, JAK: window.JAK };
 
-		if (apiConfig?.api !== 'simple') {
-			if (typeof map.addDefaultLayer === 'undefined') {
-				Api.logMixingAPIsError('simple');
-			} else {
-				Api.addLayer(map, defaultLayer).enable();
-			}
-		} else {
-			if (typeof map.addDefaultLayer !== 'undefined') {
-				Api.logMixingAPIsError('full');
-				Api.addLayer(map, defaultLayer).enable();
-			}
-		}
+    if (apiConfig?.api === 'simple') {
+      const api = await Api.processSimpleAPI(map, { markers });
 
-		if (sync.isEnabled) {
-			Api.addSync(map, sync.bottom);
-		}
-
-		if (controls) {
-			Api.addControls(map, controls);
-		}
-
-    if (markers) {
-      Api.addMarkers(map, markers);
+      if (api !== null) {
+        return { ...result, api };
+      }
     }
 
-    return map;
-	}
+    const api = await Api.processFullAPI(map, { defaultLayer, sync, controls, markers });
 
-	private static logMixingAPIsError = (loadedVariant: ApiVariantType) => {
-		const full = 'Full';
-		const simple = 'Simple';
-		const loaded = loadedVariant === 'full' ? full : simple;
-		const wanted = loadedVariant === 'simple' ? simple : full;
-
-		console.error(
-			`Map should be loaded with ${wanted} API but ${loaded} API is already loaded. Mixing APIs isn\'t supported by Mapy.cz API.`
-		);
-		console.info(`Map now uses ${loaded} API.`);
-	};
-
-	private static createCoords({ lat, lon }: CoordsType) {
-		return window.SMap.Coords.fromWGS84(lon, lat);
-	}
-
-	private static createMap(container: HTMLDivElement, center: any, zoom: number) {
-		return new window.SMap(window.JAK.gel(container), center, zoom);
-	}
-
-	private static addLayer(map: any, layer: string) {
-		return map.addDefaultLayer(window.SMap[`DEF_${layer}`]);
-	}
-
-	private static addSync(map: any, bottomMargin?: number) {
-		map.addControl(new window.SMap.Control.Sync({ bottomSpace: bottomMargin }));
-	}
-
-	private static addControls(map: any, { hasDefault, compass, mouse, keyboard }: ControlsType) {
-		if (hasDefault) {
-			map.addDefaultControls();
-		}
-
-		if (compass) {
-			map.addControl(new window.SMap.Control.Compass({ title: compass.title }), compass.style);
-		}
-
-		if (mouse) {
-			map.addControl(
-				new window.SMap.Control.Mouse(
-					(mouse.includes('pan') ? window.SMap.MOUSE_PAN : 0)
-          + (mouse.includes('wheel') ? window.SMap.MOUSE_WHEEL	: 0)
-          + (mouse.includes('zoom') ? window.SMap.MOUSE_ZOOM	: 0)
-          + (mouse.includes('zoom-in') ? window.SMap.MOUSE_ZOOM_IN	: 0)
-          + (mouse.includes('zoom-out') ? window.SMap.MOUSE_ZOOM_OUT	: 0)
-				)
-			);
-		}
-
-		if (keyboard) {
-			map.addControl(
-				new window.SMap.Control.Keyboard(
-					(keyboard.includes('pan') ? window.SMap.KB_PAN : 0)
-          + (keyboard.includes('zoom') ? window.SMap.KB_ZOOM	: 0)
-				)
-			);
-		}
-	}
-
-  private static getMarkersLayer(map: any, layerName: string) {
-    if (typeof Api.markersLayers[layerName] === 'undefined') {
-      const layer = new window.SMap.Layer.Marker();
-      map.addLayer(layer);
-      layer.enable();
-
-      Api.markersLayers[layerName] = layer;
-    }
-
-    return Api.markersLayers[layerName];
+    return { ...result, api };
   }
-
-  private static addMarkers(map: any, markers: MarkerType[], layerName = 'default') {
-    const layer = Api.getMarkersLayer(map, layerName);
-
-    markers.forEach(({ center, name, options }) => {
-      layer.addMarker(new window.SMap.Marker(Api.createCoords(center), name, options));
-    });
-  }
-
-  public static addMarkerToLayer(map: any, { center, name, options }: MarkerType, layerName = 'default') {
-    const layer = Api.getMarkersLayer(map, layerName);
-
-    layer.addMarker(new window.SMap.Marker(Api.createCoords(center), name, options));
+  private static createMap(container: HTMLDivElement, center: SMapCoordsType, zoom: number) {
+    return new window.SMap(window.JAK.gel(container), center, zoom);
   }
 }
 

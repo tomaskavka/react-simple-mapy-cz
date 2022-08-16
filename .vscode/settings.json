@@ -1,0 +1,13 @@
+{
+  "editor.tabSize": 2,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": true
+  },
+  "editor.formatOnPaste": true,
+  "editor.experimental.stickyScroll.enabled": true,
+  "eslint.validate": ["typescript"],
+  "search.exclude": {
+    "**/dist/**": true,
+    "**/__image_snapshots__": true
+  },
+}
