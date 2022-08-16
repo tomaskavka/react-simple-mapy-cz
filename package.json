@@ -1,7 +1,16 @@
 {
   "name": "react-simple-mapy-cz",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Mapy.cz for React",
+  "homepage": "https://tomaskavka.github.io/react-simple-mapy-cz",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tomaskavka/react-simple-mapy-cz.git"
+  },
+  "bugs": {
+    "url": "https://github.com/tomaskavka/react-simple-mapy-cz/issues",
+    "email": "iam@tomaskavka.cz"
+  },
   "keywords": [
     "maps",
     "mapy",
@@ -22,8 +31,8 @@
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "Tomáš Kavka <iam@tomaskavka.cz>",
+  "license": "MIT",
   "devDependencies": {
     "@babel/core": "^7.18.10",
     "@storybook/addon-actions": "^6.5.10",
