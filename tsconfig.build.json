@@ -1,0 +1,19 @@
+{
+	"compilerOptions": {
+			"target": "es6",
+			"module": "commonjs",
+			"outDir": "./dist",
+			"declaration": true,
+			"noImplicitAny": true,
+			"removeComments": true,
+			"jsx": "react",
+			"strict": true,
+			"esModuleInterop": true,
+			"skipLibCheck": true,
+			"forceConsistentCasingInFileNames": true,
+			"rootDir": "./",
+			"baseUrl": ".",
+	},
+	"include": ["src", "types"],
+	"exclude": ["node_modules", "**/*.test.ts", "**/*.test.tsx"]
+}

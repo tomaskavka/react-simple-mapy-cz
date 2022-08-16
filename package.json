@@ -1,14 +1,21 @@
 {
   "name": "react-simple-mapy-cz",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Mapy.cz for React",
+  "keywords": [
+    "maps",
+    "mapy",
+    "mapy.cz",
+    "react",
+    "react-simple-mapy-cz"
+  ],
   "main": "dist/index.cjs.js",
   "module": "dist/index.esm.js",
-  "typings": "dist/index.d.ts",
+  "typings": "dist/src/index.d.ts",
   "scripts": {
     "test": "npx jest --detectOpenHandles",
     "test:coverage": "npx jest --detectOpenHandles --collectCoverage",
-    "build": "npm run clean && node build.js && tsc --emitDeclarationOnly --outDir dist",
+    "build": "npm run clean && node build.js && tsc --project tsconfig.build.json --declaration --emitDeclarationOnly --outDir dist",
     "lint": "eslint ./",
     "clean": "rimraf dist",
     "prepublishOnly": "npm run build",
