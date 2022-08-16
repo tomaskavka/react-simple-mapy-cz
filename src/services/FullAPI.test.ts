@@ -40,14 +40,8 @@ class mockKeyboard {
 
 class mockLayerMarker {
   public name = 'LayerMarker';
-
-  public enable() {
-    mockEnableMarkerLayer();
-  }
-
-  public addMarker() {
-    mockAddMarker()();
-  }
+  addMarker = mockAddMarker;
+  enable = mockEnableMarkerLayer;
 }
 
 class mockMarker {
@@ -123,7 +117,7 @@ describe('FullAPI', () => {
       it('should init with compass', () => {
         new FullAPI(map, { controls: { compass: {} } });
 
-        expect(map.addControl).toHaveBeenCalledWith({ name: 'Compass' }, undefined);
+        expect(map.addControl).toHaveBeenCalledWith({ name: 'Compass' });
       });
 
       it('should init with mouse without actions', () => {
@@ -154,7 +148,6 @@ describe('FullAPI', () => {
     it('should init with markers', () => {
       new FullAPI(map, { markers: [{ center: { lat: 50, lon: 19 }, name: 'Testing name' }] });
 
-      expect(map.addLayer).toHaveBeenCalledWith({ name: 'LayerMarker' });
       expect(mockEnableMarkerLayer).toHaveBeenCalled();
       expect(mockAddMarker).toHaveBeenCalledWith({
         center: '50, 19',

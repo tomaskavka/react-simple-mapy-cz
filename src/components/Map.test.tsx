@@ -4,7 +4,7 @@ import Map from './Map';
 import Api from '../services/Api';
 
 jest.mock('../services/Api', () => ({
-  loadMapIntoContainer: jest.fn().mockReturnValue(Promise),
+  loadMapIntoContainer: jest.fn().mockReturnValue(Promise.resolve()),
 }));
 
 class PromiseWithResolveAndReject<T> {
