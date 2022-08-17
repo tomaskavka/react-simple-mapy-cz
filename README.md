@@ -24,7 +24,7 @@ import Map from 'react-simple-mapy-cz';
 [Demo](https://tomaskavka.github.io/react-simple-mapy-cz/?path=/story/examples-full-api--basic)
 
 ### Another examples
-More examples is in `examples` dir and you can explore [Storybook](https://tomaskavka.github.io/react-simple-mapy-cz/
+More examples are in `examples` dir and you can explore [Storybook](https://tomaskavka.github.io/react-simple-mapy-cz/
 ).
 
 ## Mapy.cz docs
@@ -34,7 +34,8 @@ More examples is in `examples` dir and you can explore [Storybook](https://tomas
 
 ## Tips
 ### Tailwind
-Pokud na projektu používáte Tailwind, musíte si do `tailwind.css` přidat následující kód, jinak nebudou mapové podklady viditelné
+If you are using Tailwind on your project, you need to add the following code to `tailwind.css`, otherwise the map backgrounds will not be visible
+
 ```
 /* Mapy.cz */
 .smap img {

@@ -1,6 +1,6 @@
 {
   "name": "react-simple-mapy-cz",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "Mapy.cz for React",
   "homepage": "https://tomaskavka.github.io/react-simple-mapy-cz",
   "repository": {
@@ -65,12 +65,11 @@
     "rimraf": "^3.0.2",
     "storybook": "^6.5.10",
     "ts-jest": "^28.0.7",
-    "typescript": "^4.7.4"
-  },
-  "dependencies": {
+    "typescript": "^4.7.4",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
+  "dependencies": {},
   "files": [
     "dist"
   ]
